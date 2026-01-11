@@ -21,6 +21,8 @@ data class TimerUiState(
 )
 
 
+
+
 sealed class TimerUiEvent {
     object SessionSaved : TimerUiEvent()
 }
@@ -29,6 +31,18 @@ sealed class TimerUiEvent {
 class TimerViewModel(
     private val repository: StudyRepository
 ) : ViewModel() {
+
+    fun setCustomDuration(seconds: Int) {
+        if (seconds <= 0) return
+        if (_uiState.value.isRunning) return
+
+        _uiState.update {
+            it.copy(
+                totalSeconds = seconds,
+                remainingSeconds = seconds
+            )
+        }
+    }
 
     private val _eventFlow = MutableSharedFlow<TimerUiEvent>()
     val eventFlow: SharedFlow<TimerUiEvent> = _eventFlow
@@ -39,7 +53,7 @@ class TimerViewModel(
 
     private var timerJob: Job? = null
 
-    // ✅ DOIT être dans la classe
+
     private var currentTaskId: Int = -1
 
     fun setTaskId(taskId: Int) {

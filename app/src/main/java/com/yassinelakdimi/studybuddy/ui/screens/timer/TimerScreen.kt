@@ -12,6 +12,9 @@ fun TimerScreen(
     viewModel: TimerViewModel,
     onBack: () -> Unit
 ) {
+    var input by remember { mutableStateOf("") }
+    var unit by remember { mutableStateOf("minutes") }
+
     val state by viewModel.uiState.collectAsState()
 
     // Snackbar state
@@ -22,9 +25,7 @@ fun TimerScreen(
         viewModel.eventFlow.collect { event ->
             when (event) {
                 is TimerUiEvent.SessionSaved -> {
-                    snackbarHostState.showSnackbar(
-                        message = "Session saved 🎉"
-                    )
+                    snackbarHostState.showSnackbar(message = "Session saved 🎉")
                 }
             }
         }
@@ -34,7 +35,7 @@ fun TimerScreen(
         snackbarHost = { SnackbarHost(snackbarHostState) },
         topBar = {
             TopAppBar(
-                title = { Text("Timer Pomodoro") },
+                title = { Text("Timer") },
                 navigationIcon = {
                     TextButton(onClick = onBack) { Text("Back") }
                 }
@@ -48,9 +49,7 @@ fun TimerScreen(
                 .fillMaxSize(),
             verticalArrangement = Arrangement.spacedBy(12.dp)
         ) {
-            val minutes = state.remainingSeconds / 60
-            val seconds = state.remainingSeconds % 60
-
+            // Show selected task (if any)
             state.taskTitle?.let { title ->
                 Text(
                     text = "Task: $title",
@@ -58,14 +57,54 @@ fun TimerScreen(
                 )
             }
 
+            // Custom duration input
+            Text("Study duration", style = MaterialTheme.typography.titleMedium)
+
+            OutlinedTextField(
+                value = input,
+                onValueChange = { input = it.filter { c -> c.isDigit() } },
+                label = { Text("Enter duration") },
+                singleLine = true,
+                modifier = Modifier.fillMaxWidth(),
+                enabled = !state.isRunning
+            )
+
+            Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+                FilterChip(
+                    selected = unit == "minutes",
+                    onClick = { unit = "minutes" },
+                    label = { Text("Minutes") },
+                    enabled = !state.isRunning
+                )
+                FilterChip(
+                    selected = unit == "seconds",
+                    onClick = { unit = "seconds" },
+                    label = { Text("Seconds") },
+                    enabled = !state.isRunning
+                )
+            }
+
+            Button(
+                onClick = {
+                    val value = input.toIntOrNull() ?: return@Button
+                    val totalSeconds = if (unit == "minutes") value * 60 else value
+                    viewModel.setCustomDuration(totalSeconds)
+                },
+                enabled = !state.isRunning
+            ) {
+                Text("Set duration")
+            }
+
+            // Timer display
+            val minutes = state.remainingSeconds / 60
+            val seconds = state.remainingSeconds % 60
 
             Text(
                 text = String.format("%02d:%02d", minutes, seconds),
-
                 style = MaterialTheme.typography.displayMedium
             )
 
-
+            // Controls
             Row(horizontalArrangement = Arrangement.spacedBy(12.dp)) {
                 Button(onClick = { viewModel.start() }, enabled = !state.isRunning) {
                     Text("Start")
