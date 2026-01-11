@@ -8,6 +8,7 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import com.yassinelakdimi.studybuddy.data.local.entity.StudySessionEntity
+import com.yassinelakdimi.studybuddy.ui.screens.progress.SessionUiModel
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -55,11 +56,17 @@ fun ProgressScreen(
 }
 
 @Composable
-private fun SessionRow(session: StudySessionEntity) {
+
+private fun SessionRow(session: SessionUiModel) {
     Card(modifier = Modifier.fillMaxWidth()) {
         Column(modifier = Modifier.padding(12.dp)) {
-            Text("Durée: ${session.durationMinutes} min")
-            Text("SubjectId: ${session.subjectId} | TaskId: ${session.taskId ?: "—"}")
+            Text("Duration: ${session.durationMinutes} min")
+
+            Text(
+                text = session.taskTitle?.let { "Task: $it" } ?: "Task: Free study",
+                style = MaterialTheme.typography.bodyMedium
+            )
         }
     }
 }
+

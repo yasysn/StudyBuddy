@@ -10,9 +10,10 @@ import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.stateIn
 
 data class ProgressUiState(
-    val sessions: List<StudySessionEntity> = emptyList(),
+    val sessions: List<SessionUiModel> = emptyList(),
     val totalMinutes: Int = 0
 )
+
 
 class ProgressViewModel(
     repository: StudyRepository
@@ -21,10 +22,25 @@ class ProgressViewModel(
     val uiState: StateFlow<ProgressUiState> =
         repository.getAllSessions()
             .map { sessions ->
+                val sessionUiModels = sessions.map { session ->
+                    val title = session.taskId?.let { taskId ->
+                        repository.getTaskById(taskId)?.title
+                    }
+
+                    SessionUiModel(
+                        durationMinutes = session.durationMinutes,
+                        taskTitle = title
+                    )
+                }
+
                 ProgressUiState(
-                    sessions = sessions,
+                    sessions = sessionUiModels,
                     totalMinutes = sessions.sumOf { it.durationMinutes }
                 )
             }
-            .stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), ProgressUiState())
+            .stateIn(
+                viewModelScope,
+                SharingStarted.WhileSubscribed(5000),
+                ProgressUiState()
+            )
 }

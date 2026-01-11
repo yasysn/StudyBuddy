@@ -16,8 +16,10 @@ import kotlinx.coroutines.flow.SharedFlow
 data class TimerUiState(
     val totalSeconds: Int = 60,
     val remainingSeconds: Int = 60,
-    val isRunning: Boolean = false
+    val isRunning: Boolean = false,
+    val taskTitle: String? = null
 )
+
 
 sealed class TimerUiEvent {
     object SessionSaved : TimerUiEvent()
@@ -42,7 +44,17 @@ class TimerViewModel(
 
     fun setTaskId(taskId: Int) {
         currentTaskId = taskId
+
+        // Load task title from database when a task is selected
+        viewModelScope.launch {
+            val title = if (taskId != -1) {
+                repository.getTaskById(taskId)?.title
+            } else null
+
+            _uiState.update { it.copy(taskTitle = title) }
+        }
     }
+
 
     fun start() {
         if (_uiState.value.isRunning) return

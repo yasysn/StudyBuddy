@@ -13,4 +13,7 @@ interface StudyRepository {
     suspend fun logStudySession(session: StudySessionEntity)
     fun getAllSessions(): Flow<List<StudySessionEntity>>
 
+    suspend fun getTaskById(taskId: Int): TaskEntity?
+
+
 }

@@ -25,4 +25,8 @@ class StudyRepositoryImpl(
     override fun getAllSessions(): Flow<List<StudySessionEntity>> =
         studySessionDao.getAllSessions()
 
+    override suspend fun getTaskById(taskId: Int): TaskEntity? =
+        taskDao.getTaskById(taskId)
+
+
 }

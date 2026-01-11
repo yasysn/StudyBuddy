@@ -51,10 +51,20 @@ fun TimerScreen(
             val minutes = state.remainingSeconds / 60
             val seconds = state.remainingSeconds % 60
 
+            state.taskTitle?.let { title ->
+                Text(
+                    text = "Task: $title",
+                    style = MaterialTheme.typography.titleMedium
+                )
+            }
+
+
             Text(
                 text = String.format("%02d:%02d", minutes, seconds),
+
                 style = MaterialTheme.typography.displayMedium
             )
+
 
             Row(horizontalArrangement = Arrangement.spacedBy(12.dp)) {
                 Button(onClick = { viewModel.start() }, enabled = !state.isRunning) {

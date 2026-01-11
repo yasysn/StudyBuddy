@@ -10,6 +10,7 @@ import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import com.yassinelakdimi.studybuddy.data.local.entity.TaskEntity
+import com.yassinelakdimi.studybuddy.ui.utils.MotivationalQuotes
 
 @Composable
 fun TasksScreen(
@@ -43,6 +44,15 @@ fun TasksScreen(
             Button(onClick = { onProgressClick() }) {
                 Text("Voir Progression")
             }
+
+            Text(
+                text = MotivationalQuotes.getDailyQuote(),
+                style = MaterialTheme.typography.bodyMedium,
+                color = MaterialTheme.colorScheme.primary
+            )
+
+            Spacer(Modifier.height(16.dp))
+
 
 
 
